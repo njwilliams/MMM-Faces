@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Face Management</title>
+
+    <link type='text/css' rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/mdb.dark.min.css">
+
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-dark bg-dark navbar-expand-md">
+        <a class="navbar-brand href="#" onclick='serverStatus()'>Face Management</a>
+      </nav>
+    </header>
+    <main>
+    <div class='container mt-3'>
+      <div class='row'>
+        <div class='col-sm-1 col-lg-4'>
+        <div class='card-container'>
+          <div class='card-flip manual-flip'>
+          <div class='card front mb-3'>
+            <div class='card-header'>Video</div>
+            <div class='card-body'>
+              <div class='form-group'>
+                <label class='form-label' for='videoSource'>Video source</label>
+                <input type='text' class='form-control' id='videoSource' onchange='setConfig(this)'/>
+                <small id='videoSourceHelp' class='form-text text-muted'>Either "pi" or a number indicating which video source to use</small>
+              </div>
+              <div class='form-group'>
+                <label class='form-label' for='rotate'>Rotate</label>
+                <input type='range' id='rotate' class='form-control' min='0' max='270' step='90' onchange='setConfig(this)'/>
+                <small id='rotateHelp' class='form-text text-muted'>How much to rotate the video</small>
+              </div><div class='form-group'>
+                <label class='form-label' for='maxFPS'>Capped FPS</label>
+                <input type='number' id='maxFPS' class='form-control' onchange='setConfig(this)'/>
+                <small id='maxFPSHelp' class='form-text text-muted'>Limit on how fast we want to burn</small>
+              </div>
+              <div class='form-group'>
+                <label class='form-label' for='fps'>Current Max FPS</label>
+                <input type='number' id='fps' class='form-control' readonly/>
+                <small id='fpsHelp' class='form-text text-muted'>Max Speed (this shows what is possible, if we were not capped). </small>
+              </div>
+            </div>
+            <div class='card-footer'><i class="fas fa-video" onclick="rotateVideoCard(this)"></i></div>
+          </div>
+          <div class='card back mb-3'>
+            <div class='card-header'>Video</div>
+            <div class='card-body'><img width='340' class='center-block' id='videoframe'>
+            <div class='form-group'>
+            <div class='form-check form-switch'>
+              <input type='checkbox' class='form-check-input' id='annotateVideo' onchange='setConfigBool(this)'/>
+              <label class='form-check-label' for='annotateVideo'>Turn on recognizer annotations</label>
+              <small class='form-text text-muted' id='annotateVideoHelp'>Display information from the facial recognizer in the video frame. This also changes the behaviour to only update the frame when the recognizer sees something of interest.</small>
+            </div>
+            </div>
+            </div>
+            <div class='card-footer'><i class="fas fa-cog" onclick="rotateVideoCard(this)"></i></div>
+          </div>
+          </div>
+        </div>
+</div>        <div class='col-sm-1 col-lg-4'>
+        <div class='card-container'>
+          <div class='card-flip manual-flip' id='facecard'>
+            <div class='card front mb-3'>
+              <div class='card-header'>Faces</div>
+              <div class='card-body'>
+                <div class='form-group'>
+                  <canvas width='340' id='storage'></canvas>
+                </div>
+                <div class='form-group'>
+                  <label class='form-label' for='maxFaceStorage'>Maximum Storage</label>
+                  <input type='number' id='maxFaceStorage' class='form-control' onchange='setConfig(this)'/>
+                  <small id='maxFaceStorageHelp' class='form-text text-muted'>Limit on much space (KB) to allow for faces</small>
+                </div>
+                <div class='list-group'>
+                  <label class='form-label'>Names</label>
+                  <div class='btn-group flex-wrap' id='names'></div>
+                  <div class='form-inline'>
+                    <input class='form-control' class='col-xs-2' size='16' placeholder='New name' id='new-name'/>
+                    <button type='button' class='btn btn-sm btn-info' onclick='addName(this)'>Add</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='card back mb-3' id='facedata'>
+              <div class='card-header'>Faces</div>
+              <div class='card-body'></div>
+              <div class='card-footer'><i class="fas fa-cog" onclick='rotateFaceCard(this,"")'></i></div>
+            </div>
+          </div>
+        </div>
+</div>        <div class='col-sm-1 col-lg-4'>
+        <div class='card-container'>
+          <div class='card-flip manual-flip'>
+          <div class='card front mb-3'>
+            <div class='card-header'>Recognition</div>
+            <div class='card-body'>
+            <div class='form-group'>
+              <div class='form-check form-switch'>
+                <input type='checkbox' class='form-check-input' id='recognize' onchange='setConfigBool(this)'/>
+                <label class='form-check-label' for='recognize'>Turn on recognition</label>
+                <small class='form-text text-muted' id='recognizeHelp'>Enable recognition processing, or just look for any faces.</small>
+              </div>
+              <div class='form-check form-switch'>
+                <input type='checkbox' class='form-check-input' id='acceleration' onchange='setConfigBool(this)'/>
+                <label class='form-check-label' for='acceleration'>Hardware acceleration</label>
+                <small class='form-text text-muted' id='accelerationHelp'>Turn on hardware acceleration for detecting faces.</small>
+              </div>
+              <div class='form-check form-switch'>
+              <input type='checkbox' class='form-check-input' id='captureUnknown' onchange='setConfigBool(this)'/>
+              <label class='form-check-label' for='captureUnknown'>Store Unknown Images</label>
+              <small class='form-text text-muted' id='captureUnknownHelp'>If an unidentified face is detected (with recognition disabled, all faces will be unknown), then save the face for later processing.</small>
+            </div>
+            </div><div class='form-group'>
+            <label class='form-label' for='rotate'>Confidence(%)</label>
+            <input type='range' id='confidence' class='form-control' min='0' max='100' step='5' onchange='setConfig(this)'/>
+            <small id='numberHelp' class='form-text text-muted'>Consider recognition failed if confidence is less than this probability</small>
+            </div>
+            <div class='form-group'>
+            <label class='form-label' for='loginTime'>Login Time</label>
+            <input type='number' id='loginTime' class='form-control'/>
+            <small id='loginTimeHelp' class='form-text text-muted'>How long to consider a successful recognition as "logged in"</small>
+            </div>
+
+
+            <button class='btn btn-warning btn-sm' id='buildModel' onclick='buildModel(this);'>Build Model</button>
+          </div>
+          <div class='card-footer'><i class='fas fa-info-circle' onclick='rotateCard(this)'></i></div>
+          </div>
+          <div class='card back mb-3'>
+            <div class='card-header'>Recognition</div>
+            <div class='card-body'>
+              <form>
+                <div class='form-group row'>
+                  <label for='modelTime' class='col-sm-4 col-form-label'>Model Date</label>
+                  <div class='col-sm-8'><input readonly class='form-control ready' type='text' id='modelTime'></input></div>
+                </div>
+              <div class='form-group row'>
+                <label class='col-sm-4 col-form-label' for='video-status'>Video</label>
+                <div class='col-sm-8'><input readonly class='form-control' id='video-status'></div>
+              </div>
+              <div class='form-group row'>
+                <label class='col-sm-4 col-form-label' for='detector-status'>Detector</label>
+                <div class='col-sm-8'><input readonly class='form-control' id='detector-status'></div>
+              </div>
+              <div class='form-group row'>
+                <label class='col-sm-4 col-form-label' for='embedder-status'>Embedder</label>
+                <div class='col-sm-8'><input readonly class='form-control' id='embedder-status'></div>
+              </div>
+              <div class='form-group row'>
+                <label class='col-sm-4 col-form-label' for='recognizer-status'>Recognizer</label>
+                <div class='col-sm-8'><input readonly class='form-control' id='recognizer-status'></div>
+              </div>
+
+              </form>
+              </div>
+              <div class='card-footer'>
+                <i class='fas fa-cog' onclick='rotateCard(this)'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      
+    </div>
+</div>
+      <div width='100%' class='card bg-dark text-white'>
+        <div class='card-body'>
+        <div id='serverlog'>
+        </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/js/mdb.min.js"></script>
+    <script type='text/javascript' src='js/gauge.min.js'></script>
+    <script type='text/javascript' src='js/main.js'></script>
+  </body>
+</html>

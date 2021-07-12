@@ -1,0 +1,107 @@
+.navbar{ background:#F97300;}
+
+.nav-link , .navbar-brand{ color: #f4f4f4; cursor: pointer;}
+
+.nav-link{ margin-right: 1em !important;}
+
+.nav-link:hover{ background: #f4f4f4; color: #f97300; }
+
+.navbar-collapse{ justify-content: flex-end;}
+
+.navbar-toggler{  background:#fff !important;}
+
+/* override background for read-only fields, since default is hard to read */
+input.form-control[readonly] {
+    background-color: #999;
+}
+
+label.col-form-label {
+    color: #ddd;
+}
+input.form-control.ready {
+    background-color:mediumseagreen;
+}
+input.form-control.failed {
+    background-color:darkred
+}
+
+.card-columns {
+    @include media-breakpoint-only(lg) {
+        column-count: 3;
+    }
+}
+
+/* Card flipping */
+
+/* entire container, keeps perspective */
+.card-container {
+    -webkit-perspective: 800px;
+ -moz-perspective: 800px;
+   -o-perspective: 800px;
+      perspective: 800px;
+      /* margin-bottom: 30px; */
+}
+
+
+.card-flip div {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* hide back of pane during swap */
+.front, .back {
+   -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+    -o-backface-visibility: hidden;
+       backface-visibility: hidden;
+   position: absolute;
+   top: 0;
+   left: 0;
+   /* background-color: #FFF; */
+   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.14);
+}
+
+.card-flip {
+    display: grid; grid-template: 1fr/ 1fr;
+    grid-template-areas: "frontAndBack";
+    transform-style: preserve-3d;
+    transition: all 0.7s ease;
+    width: 100%;
+}
+/* front pane, placed above back */
+.front {
+    grid-area: frontAndBack;
+}
+
+/* back, initially hidden pane */
+.back {
+       -webkit-transform: rotateY( 180deg );
+  -moz-transform: rotateY( 180deg );
+    -o-transform: rotateY( 180deg );
+       transform: rotateY( 180deg );
+       grid-area: frontAndBack;
+       transform: rotateY(-180deg);
+}
+
+/* hack to fix the canvas not properly disappearing */
+.canvas-disappear {
+    animation: 0.15s disappear;
+    animation-fill-mode: forwards;
+}
+@keyframes disappear {
+    99% { visibility: visible; }
+    100% { visibility: hidden; }
+}
+.canvas-appear {
+    animation: 0.2s appear;
+    animation-fill-mode: forwards;
+    visibility: hidden;
+}
+@keyframes appear {
+    99% { visibility: hidden; }
+    100% { visibility: visible; }
+}
+
+.manual-flip.flipped {
+    transform: rotateY(180deg);
+}

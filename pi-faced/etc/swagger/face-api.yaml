@@ -1,0 +1,306 @@
+swagger: '2.0'
+info:
+  title: Face Management API
+  version: '0.1'
+  description: Managing Faces for Recognition
+consumes:
+  - application/json
+produces:
+  - application/json
+basePath: /faceapi/1.0/
+paths:
+  /server/status:
+    get:
+      tags: [Admin]
+      operationId: faceapi.status
+      summary: Retrieve statistics for the server
+      responses:
+        200:
+          description: statistics available
+          schema:
+            $ref: '#/definitions/State'
+  /server/config:
+    patch:
+      tags: [Admin]
+      operationId: faceapi.set_config
+      summary: Update a configuration setting
+      parameters:
+        - $ref: '#parameters/key'
+        - $ref: '#parameters/value'
+      responses:
+        200:
+          description: Configuration has been updated
+  /server/reset:
+    post:
+      tags: [Admin]
+      operationId: faceapi.reset
+      summary: Reset the cache
+      responses:
+        200:
+          description: Cache has been reset
+  /server/rebuild:
+    post:
+      tags: [Admin]
+      operationId: faceapi.rebuild
+      summary: Start a rebuild of the recognition models. This takes quite a bit of time.
+      responses:
+        200:
+          description: Model rebuild has started
+  /server/frame.jpg:
+    get:
+      tags: [Admin]
+      operationId: faceapi.get_frame
+      summary: Shows a recent frame from the video camera for debugging.
+      parameters:
+        - $ref: '#parameters/t'
+        - $ref: '#parameters/annotated'
+      produces:
+        - image/jpeg
+      responses:
+        200:
+          description: A JPEG image from the camera. If annotated is true, then the image will include information from the face recognizer.
+          schema:
+            type: string
+            format: binary
+        503:
+          description: Video camera is unable to supply image at this time
+  /unknowns:
+    get:
+      tags: [Faces]
+      operationId: faceapi.get_unknown_faces
+      summary: Get all unknown faces
+      parameters:
+        - $ref: '#parameters/offset'
+        - $ref: '#parameters/limit'
+      responses:
+        200:
+          description: Return list of Faces
+          schema:
+            type: object
+            properties:
+              faces:
+                type: array
+                items:
+                  $ref: '#/definitions/Face'
+  /face/{face_id}:
+    get:
+      tags: [Faces]
+      operationId: faceapi.get_face
+      summary: Retrieve specific face information
+      produces:
+        - image/jpeg
+      parameters:
+        - $ref: '#parameters/face_id'
+      responses:
+        200:
+          description: Return face info
+          schema:
+            type: string
+            format: binary
+        404:
+          description: Face does not exist
+    delete:
+      tags: [Faces]
+      operationId: faceapi.del_face
+      summary: Remove the specific face
+      parameters:
+        - $ref: '#parameters/face_id'
+      responses:
+        200:
+          description: Face was successfully deleted
+        404:
+          description: Face does not exist
+  /face/{face_id}/assign/{name}:
+    post:
+      tags: [Faces,Names]
+      operationId: faceapi.assign
+      summary: Assign a face to a name
+      parameters:
+        - $ref: '#parameters/face_id'
+        - $ref: '#parameters/name'
+      responses:
+        200:
+          description: Return updated face
+          schema:
+            $ref: '#/definitions/Face'
+        404:
+          description: Face or Name does not exist
+
+  /names:
+    get:
+      tags: [Names]
+      operationId: faceapi.get_names
+      summary: Retrieve a list of known identities
+      responses:
+        200:
+          description: Returns list of names
+          schema:
+            type: object
+            properties:
+              names:
+                type: array
+                items: 
+                  type: string
+  /name/{name}:
+    get:
+      tags: [Faces]
+      operationId: faceapi.get_face_json_by_name
+      summary: Retrieve faces for a given name
+      parameters:
+        - $ref: '#parameters/name'
+        - $ref: '#parameters/offset'
+        - $ref: '#parameters/limit'
+      responses:
+        200:
+          description: Returns list of faces
+          schema:
+            type: object
+            properties:
+              faces:
+                type: array
+                items:
+                  $ref: '#/definitions/Face'
+    put:
+      tags: [Faces]
+      operationId: faceapi.add_name
+      summary: Create a new name
+      parameters:
+        - $ref: '#parameters/name'
+      responses:
+        200:
+          description: Name was successfully created
+    delete:
+      tags: [Faces]
+      operationId: faceapi.del_name
+      summary: Delete name
+      parameters:
+        - $ref: '#parameters/name'
+      responses:
+        200:
+          description: Name was successfully deleted
+
+parameters:
+  face_id:
+    name: face_id
+    description: Face unique identifier
+    in: path
+    type: string
+    required: true
+    pattern: "^[-a-zA-Z0-9]+$"
+  name:
+    name: name
+    description: Name
+    in: path
+    type: string
+    required: true
+    pattern: "^[a-zA-Z ]+$"
+  offset:
+    name: offset
+    description: The number of items to skip before starting to collect the results
+    in: query
+    type: integer
+    required: false
+  limit:
+    name: limit
+    description: The number of items to return
+    in: query
+    type: integer
+    required: false
+  t:
+    name: timestamp
+    description: a timestamp (seconds since epoch)
+    in: query
+    type: integer
+    required: false
+  annotated:
+    name: annotated
+    description: if video frame should include recognition annotations
+    in: query
+    type: boolean
+    required: false
+  key:
+    name: key
+    description: name of a configuration setting
+    in: query
+    required: true
+    type: string
+  value:
+    name: value
+    description: value of a configuration setting
+    in: query
+    required: true
+    type: string
+
+    
+
+definitions:
+  Face:
+    type: object
+    required:
+      - name
+      - when
+    properties:
+      uuid:
+        type: string
+        description: Opaque Identifier for Face
+        example: "123456789ab"
+        readOnly: true
+      name:
+        type: string
+        description: Name to attach to Face
+        example: "Nick"
+        minLength: 1
+        maxLength: 100
+      when:
+        type: string
+        format: date-time
+        description: Timestamp of the Face
+        example: "2021-07-02T15:35:21"
+        readOnly: true
+  State:
+    type: object
+    required:
+      - cachetime
+      - names
+      - unknowns
+      - storage
+      - available
+      - modeldata
+      - modelLog
+    properties:
+      cachetime:
+        type: string
+        format: date-time
+        description: Time that cache was reset
+        example: "2021-07-02T15:35:21"
+        readOnly: true
+      names:
+        type: integer
+        description: Number of known names
+        readOnly: true
+      unknowns:
+        type: integer
+        description: Number of unknown images captured
+        readOnly: true
+      storage:
+        type: integer
+        description: Amount of storage used by Faces (KiB)
+        readOnly: true
+      available:
+        type: integer
+        description: Amount of storage available (KiB)
+        readOnly: true
+      modeltime:
+        type: string
+        format: date-time
+        description: When model was last built
+        example: "2021-07-02T15:35:21"
+        readOnly: true
+      modelLog:
+        type: string
+        description: log of the last model rebuild
+      fps:
+        type: integer
+        description: how many frames per second (averaged over last 20 frames)
+
+

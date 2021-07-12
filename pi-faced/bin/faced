@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+# -*- python -*-
+
+# import the necessary packages
+import threading
+import imutils
+import time
+import cv2
+import json
+import sys
+import signal
+import os
+import collections
+import logging
+
+BIN=sys.argv[0]
+# An optimized "get me the absolute path for my binary" algo,
+# which tries to not actually do any touching of the filesystem
+if BIN[0] != '/':
+    if 'PWD' in os.environ:
+        binstat = os.stat(BIN)
+        BIN = os.path.join(os.environ['PWD'], sys.argv[0])
+        newstat = os.stat(BIN)
+        if binstat.st_ino != newstat.st_ino:
+            BIN = os.path.realpath(sys.argv[0])
+
+BINDIR = os.path.dirname(BIN)
+LIBDIR = os.path.join(BINDIR, "..", "lib")
+if LIBDIR not in sys.path:
+    sys.path.append(LIBDIR)
+import faceapi
+from faceapi import Face
+import faceutils
+from faceutils import get_path
+
+faceutils.configureLogging()
+faceutils.init_status()
+
+swaggerDir = os.path.join(BINDIR, "..", "etc", "swagger")
+
+def signalHandler(signal, frame):
+        global closeSafe
+        closeSafe = True
+
+#signal.signal(signal.SIGINT, signalHandler)
+closeSafe = False
+
+frameTimes = collections.deque(maxlen=20)
+
+def watchvideo():
+    faceutils.init_video()
+    faceutils.init_recognition()
+    
+    # loop over frames from the video file stream. The loop deliberately
+    # does not optimize config lookups, because we want to be able to change
+    # the config on the fly
+    loggedin = dict()
+    while True:
+        if closeSafe == True:
+            break
+
+        frame_start = time.perf_counter()
+        frame = faceutils.get_new_frame()
+        # update who is there, based on analysing the frame
+        logins = list()
+        if frame is not None:
+            frame, names = faceutils.look_for_faces(frame)
+            if len(names) > 0:
+                faceutils.update_annotated_frame(frame)
+            for n in names:
+                if not n:
+                    continue
+                # If the recognition now thinks there's an unknown, but
+                # we already had a known, then it's a downgrade and we'll
+                # skip over that and let the timer deal with it, to prevent
+                # false negatives from dropping information.
+                if n == 'unknown' and len(loggedin) > 0:
+                    continue
+                if n not in loggedin:
+                    logins.append(n)
+                loggedin[n] = time.time()
+
+        # send upstream the info on logins/logouts
+        if len(logins) > 0:
+            faceutils.printjson("login", { "names": logins })
+
+        now = time.time()
+        logouts = list()
+        loginTime    = faceutils.get_config("Recognition").getfloat("loginTime")
+        for who, when in loggedin.items():
+            if now > (when + loginTime):
+                logouts.append(who)
+        if len(logouts) > 0:
+            faceutils.printjson("logout", { "names" : logouts })
+            for n in logouts:
+                del loggedin[n]
+
+        frame_end = time.perf_counter()
+        this_frame = frame_end - frame_start
+        frameTimes.append(this_frame)
+        denom = sum(frameTimes)
+        if denom > 0:
+            faceapi.updateFPS(len(frameTimes) / denom)
+        maxFPS = faceutils.get_config("Video").getint("maxFPS")
+        frameTime = 0
+        if maxFPS > 0:
+            frameTime = 1/maxFPS
+            if this_frame < frameTime:
+                time.sleep(frameTime - this_frame)
+    
+
+if __name__ == "__main__":
+    # Start watching the video in a thread
+    t = threading.Thread(target=watchvideo)
+    t.start()
+
+    # Get the API up and running
+    Face.Reset_Cache()
+    faceapi.startAPI()
+
+    # the API has shutdown, let's close the video thread
+    closeSafe = True
+    t.join()
+
+    # do a bit of cleanup
+    cv2.destroyAllWindows()

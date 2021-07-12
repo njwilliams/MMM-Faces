@@ -1,0 +1,25 @@
+{
+  "name": "Magic-Mirror-Module-Faces",
+  "version": "1.0.0",
+  "description": "Facial recognition and management for the Magic Mirror.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njw/MMM-Faces"
+  },
+  "keywords": [
+    "magic mirror",
+    "smart mirror",
+    "Facial recognition",
+    "module"
+  ],
+  "author": "Nick Williams",
+  "contributors": "https://github.com/njw/MMM-Faces/graphs/contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/njw/MMM-Faces/issues"
+  },
+  "homepage": "https://github.com/njw/MMM-Faces#readme",
+  "dependencies": {
+    "child_process": "latest"
+  }
+}
