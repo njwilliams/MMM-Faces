@@ -178,39 +178,3 @@ find that you don't need real-time recognition - it will burn more power and hea
 so it's better to limit the processing down to a value that is still effective without
 being wasteful.
 
-The entry in config.js can look like the following. (NOTE: You only have to add the variables to config if want to change its standard value.)
-
-```
-{
-	module: 'MMM-Faces',
-	config: {
-		//Module set used for strangers and if no user is detected
-		defaultClass: "default",
-	}
-}
-```
-
-In order for this module to do anything useful you have to assign custom classes to your modules. The class `default` (if you don't change it) is shown if no user is detected or a stranger. The class `everyone` (if you don't change it) is shown for all users. To specify modules for a certain user, use their name as classname.
-
-```
-{
-	module: 'example_module',
-	position: 'top_left',
-	//Set your classes here seperated by a space.
-	//Shown for all users
-	classes: 'default everyone'
-},
-{
-	module: 'example_module2',
-	position: 'top_left',
-	//Only shown for me
-	classes: 'Paul-Vincent'
-}
-```
-
-## Dependencies
-- [python-shell](https://www.npmjs.com/package/python-shell) (installed via `npm install`)
-- [OpenCV](http://opencv.org) (`sudo apt-get install libopencv-dev python-opencv`)
-
-## Open Source Licenses
-###[pi-facerec-box](https://github.com/tdicola/pi-facerec-box)
