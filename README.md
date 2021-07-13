@@ -11,17 +11,19 @@ This an extension for the [MagicMirror](https://github.com/MichMich/MagicMirror)
 
 ## Background
 
-There's a few facial recognition modules for Magic Mirror. I've tried most of them, and found them a bit painful to setup. Furthermore, the setup is something that needs to be done again and again. I felt that there must be an easier way of managing this, so decided to build one, building on the work that the authors of the other facial recognition modules.
+There's a few facial recognition modules for Magic Mirror. I've tried most of them, and found them a bit painful to setup. Furthermore, the setup is something that needs to be done again and again and building and capturing the images seemed awkward. I felt that there must be an easier way of managing this, so decided to build one, and then got carried away. For other alternative implementations, take a look at...
 
-  MMM-Face-Reco-DNN
-  MMM-Facial-Recognition
-  MMM-Face-Recognition-SMAI
+  * https://github.com/nischi/MMM-Face-Reco-DNN
+  * https://github.com/jimbydude/MMM-Face-Multi-User-Recognition-SMAI (a more active fork of https://github.com/EbenKouao/MMM-Face-Recognition-SMAI)
+  * https://github.com/paviro/MMM-Facial-Recognition (abandoned)
+  * https://github.com/paviro/MMM-Facial-Recognition-Tools (abandoned)
+  * https://github.com/normyx/MMM-Facial-Recognition-OCV3 (abandoned)
 
 Originally I started patching and looking at these pre-existing modules, but felt that I needed a more drastic overhaul. This is the result, yet another facial recognition module, which I've called MMM-Faces. This might change to be a standalone program (pi-faced) in the future, so I've built it with that in mind.
 
 ## Usage
+
 This is a work in progress!!!!!
-TODO includes at least setting up an API key for the interface.
 
 This system is designed to take all the work out of managing the building of the recognition network. You do not need to manage the AI/ML parts of this. You do not need to find images. You can start with nothing, and let the system capture images for you. You don't need to run scripts on the raspberry PI. Every now and again you should go into a user interface to categorize images to rebuild the AI/ML model if you think that it needs it. Everything you need to do should be available from that user interface. The intent is that you do not need to touch a command line in order to manage this (almost there...)
 
@@ -57,18 +59,17 @@ Let's go into more detail about all of these steps.
 ## 1. Install
 
 Installing facial recognition software is a bit of a hassle.  And I'm all for compiling from source, but this takes hours,
-so I've found a couple of shortcuts...
-1. apt-get install ....
-2. pip3 get ....
-3. download the Intel OpenVino tarball. This avoids you having to compile all the OpenCV stuff from scratch, and gives you working integration with the Intel Movidius compute stick.
-4. git clone MMM-Faces
-5. git clone MMM-ProfileSwitcher
+so I've found a couple of shortcuts.
+1. sudo apt-get install stuff. Not sure what's needed here yet. I need to try again since my first attempt was before I found the openvino stuff and i had to compile everything. That's not neccessary...
+2. download and install the Intel OpenVino distribution as per https://docs.openvinotoolkit.org/latest/openvino_docs_install_guides_installing_openvino_raspbian.html. This avoids you having to compile all the OpenCV stuff from scratch, and gives you working integration with the Intel Movidius compute stick.
+3. cd ~/MagicMirror/modules ; git clone https://github.com/njwilliams/MMM-Faces.git
+4. Install any node and python requirements: cd MMM-Faces ; pip3 install -r requirements.txt ; npm install
 
 When you install the OpenVino kit, you'll need to update the way in which you invoke Magic Mirror to make sure that you have all of the environment variables correctly configured for OpenVino. For example, if you're using pm2, then edit your start script to add the following line before the invocation of "npm start":
 
   source ~/openvino/bin/setupvars.sh
 
-If you miss this step, there's no helpful error to say things aren't working (that I've found yet). Instead, you'll find that the Embedder will never move from state "warming..." to "ready" (you can see this status in the info in step 3 of this guide).
+If you miss this step, there's no helpful error to say things aren't working (that I've found yet). Instead, you'll find that the Embedder will never move from state "warming..." to "ready" (you can see this status in the info in step 3 of this guide). Note that depending on what version and how it was installed, the path to the setupvars might be different, like /opt/openvivino, or something like that.
 
 ## 2. Magic Mirror Configuration (Phase 1)
 
@@ -85,8 +86,10 @@ this point.
 ## 3. First Look at the FaceAdmin Interface
 
 At this point, you should check that the recognition has everything setup in the way it needs. Is the camera
-working, oriented correctly, etc. The easiest way to do this is to go the admin interface. The admin
-interface should be available at .... about 30 seconds after the magic mirror is started - it takes a while
+working, oriented correctly, etc. The easiest way to do this is to go the admin interface from a web browser on
+the same network as your magic mirror (your phone will do). You need to know the IP address of your mirror. The admin
+interface should be available at http://IPADDRESS:8081/ (for example, http://192.168.1.99:8081/) about 30 
+seconds after the magic mirror is started - it takes a while
 for everything to get up and running! If you can't access the interface after a minute, then something is
 probably wrong and you need to go back and check your error logs. One debug tip is to turn off auto-restart
 of the magic mirror and just use the command "ELECTRON_ENABLE_LOGGING=1 npm start" to start the mirror
@@ -94,7 +97,7 @@ with all the debug, and see what kind of errors might be happening.
 
 If all is going well, then your admin interface should look like the following:
 ![Admin Interface](media/admin-ui.png)
-There are four main areas here.
+There are four main areas here, and we'll go into more detail on each of them, but a quick tour...
 1. The video configuration. There is a video icon at the bottom of this section that toggles a "live feed"
 from the vide camera to check that the configuration is correct. If you get a "broken image" icon when
 you look at the live feed, you should look at the logs to work out what's going wrong. Note that there
@@ -117,7 +120,10 @@ of how much storage to use for faces.
 
 So, from this early stage, we should see the recognition system "live" (in that the UI is working, showing
 us useful log messages, and the video camera works). That's our goal for now. If one of those aspects is
-not working correctly, then you'll need to troubleshoot.
+not working correctly, then you'll need to troubleshoot. There are icons on the video and recognition
+panels that flip over to see how stuff is working. The video panel will show you the view through the
+camera. The recognition panel will show you the status of all of the components with a quick color
+coding of if things look good (grey = Neutral, not sure; red = Something's broken; green = all looks good).
 
 ## 4. Capture Faces
 
@@ -153,9 +159,23 @@ you!
 ## 6. Turn things on!
 
 Okay, so have a facial recognition model built and things should work. Time to try it out!
+What's happening now is that any time a face is detected, then a request will be sent to 
+MMM-ProfileSwitcher to set a specific profile. If the face was recognized, then the profile
+will be the name set in the Face management UI. If the face was not recognized, then
+the profile will be called "unknown".
+
+MMM-ProfileSwitcher will activate the appropriate profiles based on that name. So, 
 You can edit the config of magic mirror to put in names into each section, by adding a
 className to every section of the mirror. For example, if you only want the calendar to
-be visible to Nick, then set className="Nick" in the calendar module.
+be visible to Nick, then set className="Nick" in the calendar module. If you want the
+calendar to be visible to everyone, then set className="everyone". I find that the useful
+bit of config to have in MMM-ProfileSwitcher is:
+
+    ignoreModules: ['MMM-ProfileSwitcher', 'MMM-Faces'],
+    everyoneClass: 'everyone',
+
+Note that you really need to make sure to add MMM-ProfileSwitcher and MMM-Faces into the
+ignore list, otherwise the mirror won't wake up anything...
 
 ## 7. Rinse and repeat
 
@@ -178,39 +198,3 @@ find that you don't need real-time recognition - it will burn more power and hea
 so it's better to limit the processing down to a value that is still effective without
 being wasteful.
 
-The entry in config.js can look like the following. (NOTE: You only have to add the variables to config if want to change its standard value.)
-
-```
-{
-	module: 'MMM-Faces',
-	config: {
-		//Module set used for strangers and if no user is detected
-		defaultClass: "default",
-	}
-}
-```
-
-In order for this module to do anything useful you have to assign custom classes to your modules. The class `default` (if you don't change it) is shown if no user is detected or a stranger. The class `everyone` (if you don't change it) is shown for all users. To specify modules for a certain user, use their name as classname.
-
-```
-{
-	module: 'example_module',
-	position: 'top_left',
-	//Set your classes here seperated by a space.
-	//Shown for all users
-	classes: 'default everyone'
-},
-{
-	module: 'example_module2',
-	position: 'top_left',
-	//Only shown for me
-	classes: 'Paul-Vincent'
-}
-```
-
-## Dependencies
-- [python-shell](https://www.npmjs.com/package/python-shell) (installed via `npm install`)
-- [OpenCV](http://opencv.org) (`sudo apt-get install libopencv-dev python-opencv`)
-
-## Open Source Licenses
-###[pi-facerec-box](https://github.com/tdicola/pi-facerec-box)

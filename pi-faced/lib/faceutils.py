@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import cv2
@@ -52,6 +53,7 @@ status     = dict()
 
 def init_status():
     global status
+    status["cv2"]   = cv2.__version__
     status["video"] = "not started"
     status["embedder"] = "not started"
     status["recognizer"] = "not started"
@@ -170,9 +172,9 @@ def init_video():
                 vs = VideoStream(src=get_config("Video").getint("videoSource")).start()
             else:
                 vs = VideoStream(src=video).start()
-            set_status("video", "ready")
+            set_status("video", "ready", "ready")
         except Exception as e:
-            set_status("video", "failed")
+            set_status("video", "failed", "failed")
             logging.error("video failed: %s" % e)
             vs = None
 
@@ -184,9 +186,9 @@ def get_new_frame():
         return Frame
     return None
 
-def set_status(key, value):
+def set_status(key, value, goodness='neutral'):
     global status
-    status[key] = value
+    status[key] = { 'value': value, 'goodness': goodness, 'when': time.time() }
 
 def get_status():
     global status
@@ -210,6 +212,15 @@ def init_recognition():
     global recognizer
     global embedder
     global labeller
+
+    # We need to have a reasonable build of python CV2 lib
+    # right now, only validated with openvino. If we add more
+    # versions that we've tested, we can expand this...
+    if not re.search(r'(openvino)', cv2.__version__):
+        set_status('cv2', cv2.__version__, 'failed')
+        return
+    set_status('cv2', cv2.__version__, 'ready')
+
     acceleration = get_config("Recognition").getboolean("acceleration")
 
     with recogLock:
@@ -222,13 +233,13 @@ def init_recognition():
             if acceleration:
                 try:
                     detector.setPreferableTarget(cv2.dnn.DNN_TARGET_MYRIAD)
-                    set_status("detector", "ready, accelerated")
+                    set_status("detector", "ready, accelerated", "ready")
                 except Exception as e:
                     logging.info("fallback to CPU, since failed to activate myriad (%s)" % e)
                     detector.setPreferableTarget(cv2.dnn.DNN_BACKEND_OPENCV)
             else:
                 detector.setPreferableTarget(cv2.dnn.DNN_BACKEND_OPENCV)
-            set_status("detector", "ready")
+            set_status("detector", "ready", "ready")
 
             set_status("embedder", "starting...")
             modelPath = os.path.join(ETCDIR, "face_embedding_model/openface_nn4.small2.v1.t7")
@@ -238,14 +249,14 @@ def init_recognition():
                 embedder.setPreferableTarget(cv2.dnn.DNN_BACKEND_OPENCV)
                 set_status("embedder", "initialized")
             except Exception as e:
-                set_status("embedder", "failed")
+                set_status("embedder", "failed", "failed")
                 logging.warning("Disabling recognition because embedder failed: %s" % e)
                 embedder = None
 
             if embedder is not None:
                 logging.info("loading encodings...")
                 recognizer = pickle_read("recognizer")
-                set_status("recognizer", "ready")
+                set_status("recognizer", "ready", "ready")
                 labeller   = pickle_read("labels")
                 # Warm the embedder. This takes time (more than it takes to warm the picamera)
                 logging.info("warming embedder...")
@@ -258,7 +269,7 @@ def init_recognition():
                 t1 = time.perf_counter()
                 vec = embedder.forward()
                 t2 = time.perf_counter()
-                set_status("embedder", "ready")
+                set_status("embedder", "ready", "ready")
                 logging.info("dummy embedder run took %fs" % (t2-t1))
             
 
@@ -286,7 +297,7 @@ def rebuild_model():
                     vec = embedder.forward()
                     namelist.append(n)
                     embeddings.append(vec.flatten())
-            set_status("embedder", "ready")
+            set_status("embedder", "ready", "ready")
             
             labeller = LabelEncoder()
             labels = labeller.fit_transform(namelist)
@@ -299,7 +310,7 @@ def rebuild_model():
             model.fit(embeddings, labels)
             set_status("recognizer", "rebuilding...")
             recognizer = model.best_estimator_
-            set_status("recognizer", "ready")
+            set_status("recognizer", "ready", "ready")
 
     t2 = time.perf_counter()
     pickle_write("recognizer", recognizer)

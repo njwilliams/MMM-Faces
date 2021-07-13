@@ -6,11 +6,10 @@
         var thing = document.getElementById(label);
         thing.value = value;
     }
-    function setState(label, value) {
+    function setState(label, state) {
         var thing = document.getElementById(label);
-        thing.value = value;
-        var word = value.replace(/[^a-zA-Z].*/, '');
-        thing.className = 'form-control ' + word;
+        thing.value = state.value;
+        thing.className = 'form-control ' + state.goodness;
     }
     function setBool(label, value) {
         var thing = document.getElementById(label);
@@ -102,6 +101,7 @@
             gauge.animationSpeed = 32; // set animation speed (32 is default value)
             gauge.set(myjson.storage);
 
+            setState('cv2-status', myjson.cv2);
             setState('recognizer-status', myjson.recognizer);
             setState('embedder-status', myjson.embedder);
             setState('video-status', myjson.video);
