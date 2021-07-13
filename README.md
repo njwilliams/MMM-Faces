@@ -137,7 +137,7 @@ switches that section to show you the view through the
 camera. The recognition panel has an info icon that will flip the recognition settings to
 show you the status of all of the components with a quick color
 coding of if things look good (grey = Neutral, not sure; red = Something's broken; green = all looks good).
-<img src="media/recognizer-status.png" width="400">
+<img src="media/recognizer-status.png" width="300" alt="recognizer status">
 Note that if you change any of the configuration for the video or the recognition, the status
 will show things as being unavailable during the re-initialization of that component.
 
