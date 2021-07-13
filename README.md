@@ -126,7 +126,8 @@ of how much storage to use for faces.
 4. Finally, there's a log section at the bottom of the admin UI, that provides the last 20 or so
    lines of log from the facial recognition system. All API requests, any messages from the
    recognition system, debug data, etc. This is not a live updating log. Just reload the page if you want
-   to refresh the log with more recent data.
+   to refresh the log with more recent data (You can click the logo on the top-left of the page to update
+   the content, rather than a full reload)
 
 So, from this early stage, we should see the recognition system "live" (in that the UI is working, showing
 us useful log messages, and the video camera works). That's our goal for now. If one of those aspects is
