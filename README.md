@@ -129,6 +129,7 @@ of how much storage to use for faces.
    to refresh the log with more recent data (You can click the logo on the top-left of the page to update
    the content, rather than a full reload)
 
+<img src="media/recognizer-status.png" width="300" alt="recognizer status">
 So, from this early stage, we should see the recognition system "live" (in that the UI is working, showing
 us useful log messages, and the video camera works). That's our goal for now. If one of those aspects is
 not working correctly, then you'll need to troubleshoot. There are icons on the video and recognition
@@ -137,7 +138,6 @@ switches that section to show you the view through the
 camera. The recognition panel has an info icon that will flip the recognition settings to
 show you the status of all of the components with a quick color
 coding of if things look good (grey = Neutral, not sure; red = Something's broken; green = all looks good).
-<img src="media/recognizer-status.png" width="300" alt="recognizer status">
 Note that if you change any of the configuration for the video or the recognition, the status
 will show things as being unavailable during the re-initialization of that component.
 
