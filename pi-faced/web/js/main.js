@@ -1,5 +1,5 @@
     var gNameList = [];
-    var gEndpoint = "http://192.168.1.99:8081/faceapi/1.0";
+    var gEndpoint = "/faceapi/1.0";
     var gVideoTimer = null;
 
     function setValue(label, value) {
