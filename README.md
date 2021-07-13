@@ -75,13 +75,21 @@ If you miss this step, there's no helpful error from python to say things aren't
 
 At first, you want to put a really simple config into the magic mirror config, since you don't have the
 recognition all working yet, and things won't wire up the way you expect, so let's start simple.
-1. Install MMM-ProfileSwitcher into your config with a very simple config
-2. Install MMM-Faces into your config with even simpler config.
+1. Install MMM-ProfileSwitcher into your config with a very simple config, based on defaults from the MMM-ProfileSwitcher setup page. Note that you should add  MMM-Faces to the ignoreModules list!
+2. Install MMM-Faces into your config with even simpler config. There is no config in MagicMirror for MMM-Faces, so you just need the invocation of the module with no settings at all:
+    {
+       module: 'MMM-Faces',
+    },
+That's it!
 
 Run Magic Mirror to see that it works without errors. It should look exactly like it used to
 at this point, with no errors, no changes. If that's the case, you're doing good! If there's an
 error happening here, then fix it before moving on, since we expect a working configuration at
-this point.
+this point. If you've fiddled with the ProfileSwitcher config, it's possible that nothing will display
+on the mirror. If that's the case, it's because of the ProfileSwitcher config, nothing to do with
+MMM-Faces, since we haven't yet started using it! So, if you've got just a blank screen at this point,
+it means that you need to annotate your modules with classes. See the MMM-ProfileSwitcher documentation
+for more information.
 
 ## 3. First Look at the FaceAdmin Interface
 
