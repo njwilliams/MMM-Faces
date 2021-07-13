@@ -5,8 +5,8 @@ This an extension for the [MagicMirror](https://github.com/MichMich/MagicMirror)
 
   * Uses a fast recognition network.
   * Supports hardware acceleration through Intel's Movidius compute stick (I'm generally seeing 6fps recognition on a Pi 3B+, however I need to get around to taking down the mirror in order to remove the compute stick to get some useful benchmarks...).
-  * Provides a rich user interface for managing the facial recognition: capturing images, categorising, rebuilding model, and configuring the overall face recognition system. The theory is that you can configure, test and debug everything through the user interace.
-  * Provides an API for managing the facial recognition should you want that.
+  * Provides a rich user interface for managing the facial recognition: capturing images, categorising, rebuilding model, and configuring the overall face recognition system. The theory is that you can configure, test and debug everything through the user interace. (UI available at http://$HOST:8081/)
+  * Provides an API for managing the facial recognition should you want that (Swagger UI available at http://$HOST:8081/faceapi/1.0/ui).
   * "Simple" management (all a matter of perspective, of course).
 
 ## Background
@@ -88,7 +88,7 @@ this point.
 At this point, you should check that the recognition has everything setup in the way it needs. Is the camera
 working, oriented correctly, etc. The easiest way to do this is to go the admin interface from a web browser on
 the same network as your magic mirror (your phone will do). You need to know the IP address of your mirror. The admin
-interface should be available at http://IPADDRESS:8081/ (for example, http://192.168.1.99:8081/) about 30 
+interface should be available at http://$HOST:8081/ (for example, http://192.168.1.99:8081/) about 30 
 seconds after the magic mirror is started - it takes a while
 for everything to get up and running! If you can't access the interface after a minute, then something is
 probably wrong and you need to go back and check your error logs. One debug tip is to turn off auto-restart
