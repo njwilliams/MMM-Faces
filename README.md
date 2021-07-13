@@ -132,9 +132,14 @@ of how much storage to use for faces.
 So, from this early stage, we should see the recognition system "live" (in that the UI is working, showing
 us useful log messages, and the video camera works). That's our goal for now. If one of those aspects is
 not working correctly, then you'll need to troubleshoot. There are icons on the video and recognition
-panels that flip over to see how stuff is working. The video panel will show you the view through the
-camera. The recognition panel will show you the status of all of the components with a quick color
+panels that flip over to see how stuff is working. The video panel has a camera icon at the bottom that
+switches that section to show you the view through the
+camera. The recognition panel has an info icon that will flip the recognition settings to
+show you the status of all of the components with a quick color
 coding of if things look good (grey = Neutral, not sure; red = Something's broken; green = all looks good).
+![Status](media/recognizer-status.png)
+Note that if you change any of the configuration for the video or the recognition, the status
+will show things as being unavailable during the re-initialization of that component.
 
 ## 4. Capture Faces
 
@@ -142,9 +147,9 @@ This part is easy. Just occasionally look at the mirror! Go into the admin inter
 capture images have reasonable quality. If you don't have enough light, you might need to illuminate
 the scene. To check the images being captured, go to the admin UI and there will be an "Unknown" name
 listed in the names section on the Faces configuration section. Clicking the Unknown name will flip
-the card to an interface showing the captured images. You can move through the images with the
+the card to an interface showing the captured faces. You can move through the images with the
 left and right buttons, and delete any images that you don't like. By default, an unknown face
-will only be captured once per minute, to avoid filling up the storage.
+will only be captured once per minute, to avoid filling up the storage with identical pictures.
 You can also go to the video feed and toggle the switch to annotate the video feed. That will
 then show what the recognizer is seeing.
 
@@ -156,16 +161,19 @@ people that you want to recognize. The exact text of that name is what will be s
 mirror identifying a profile.
 
 Once you've created your names, click the "Unknown" names button to look at the unknown
-images. When looking at unknowns, you will find buttons for every name under the image. Clicking
+images. When looking at unknowns, you will find blue buttons for every name. Clicking
 a specific name will assign that image to the given name.  If you get it wrong, you can go back
 to the face config and click on the user, and run through the faces there. Each face there has
-a button to mark the face back to "unknown" for re-categorization.
+a blue button to mark the face back to "unknown" for re-categorization.
+![The Sorting Hat](media/face-sorting.png)
 
 Once you've categorized the images, you can build a recognition model by clicking the "Build
 Model" button in the recognition configuration section. This takes about a minute for a typical
 configuration: around 4 names, each with around 10-20 images. Once the model is built, you
 can flick the slider for "Turn on recognition" and see how well the camera does at recognizing
-you!
+you! Within the video tab, you can also click the slider to show only frames that have
+faces.
+![I See You](media/annotated-frame.png)
 
 ## 6. Turn things on!
 
