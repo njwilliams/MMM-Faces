@@ -117,11 +117,11 @@ how best to configure your system.
 2. The face configuration is the middle section. Here you can create new names, and set the configuration
 of how much storage to use for faces.
 3. The recognizer configuration panel. When first downloaded, the defaults are: 
- - have recognition disabled (it doesn't know who to recognize!), 
- - capture images of people we don't recognize for later sorting (that goes into the storage bucket
-   we looked at in the face configuration panel).
- - Some recognition parameters that we can leave to default for now.
- - There's a button to rebuild the model in this section. Cool, but we have
+   - have recognition disabled (it doesn't know who to recognize!), 
+   - capture images of people we don't recognize for later sorting (that goes into the storage bucket
+     we looked at in the face configuration panel).
+   - Some recognition parameters that we can leave to default for now.
+   - There's a button to rebuild the model in this section. Cool, but we have
    no data right now to build a model with, so that won't do anything useful for us yet.
 4. Finally, there's a log section at the bottom of the admin UI, that provides the last 20 or so
    lines of log from the facial recognition system. All API requests, any messages from the
