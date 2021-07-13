@@ -166,7 +166,8 @@ images. When looking at unknowns, you will find blue buttons for every name. Cli
 a specific name will assign that image to the given name.  If you get it wrong, you can go back
 to the face config and click on the user, and run through the faces there. Each face there has
 a blue button to mark the face back to "unknown" for re-categorization.
-![The Sorting Hat](media/face-sorting.png)
+
+<img src="media/face-sorting.png" width="300" alt="The Sorting Hat">
 
 Once you've categorized the images, you can build a recognition model by clicking the "Build
 Model" button in the recognition configuration section. This takes about a minute for a typical
@@ -174,7 +175,8 @@ configuration: around 4 names, each with around 10-20 images. Once the model is 
 can flick the slider for "Turn on recognition" and see how well the camera does at recognizing
 you! Within the video tab, you can also click the slider to show only frames that have
 faces.
-![I See You](media/annotated-frame.png)
+
+<img src="media/annotated-frame.png" width="300" alt="I see you">
 
 ## 6. Turn things on!
 
