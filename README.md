@@ -69,7 +69,7 @@ When you install the OpenVino kit, you'll need to update the way in which you in
 
     source ~/openvino/bin/setupvars.sh
 
-If you miss this step, there's no helpful error to say things aren't working (that I've found yet). Instead, you'll find that the Embedder will never move from state "warming..." to "ready" (you can see this status in the info in step 3 of this guide). Note that depending on what version and how it was installed, the path to the setupvars might be different, like /opt/openvivino, or something like that.
+If you miss this step, there's no helpful error from python to say things aren't working (that I've found yet). Instead, you'll find that the Embedder will never move from state "warming..." to "ready" (you can see this status in the info in step 3 of this guide). Therefore I've made that one of the checks in the admin interface to show if you've got the right version of cv2 installed. You'll see that in the recognition status. Note that depending on what version and how it was installed, the path to the setupvars might be different, like /opt/openvivino, or something like that.
 
 ## 2. Magic Mirror Configuration (Phase 1)
 
