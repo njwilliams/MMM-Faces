@@ -77,11 +77,11 @@ At first, you want to put a really simple config into the magic mirror config, s
 recognition all working yet, and things won't wire up the way you expect, so let's start simple.
 1. Install MMM-ProfileSwitcher into your config with a very simple config, based on defaults from the MMM-ProfileSwitcher setup page. Note that you should add  MMM-Faces to the ignoreModules list!
 2. Install MMM-Faces into your config with even simpler config. There is no config in MagicMirror for MMM-Faces, so you just need the invocation of the module with no settings at all:
-
+```
     {
        module: 'MMM-Faces',
     },
-
+```
 That's it!
 
 Run Magic Mirror to see that it works without errors. It should look exactly like it used to
@@ -181,8 +181,10 @@ be visible to Nick, then set className="Nick" in the calendar module. If you wan
 calendar to be visible to everyone, then set className="everyone". I find that the useful
 bit of config to have in MMM-ProfileSwitcher is:
 
+```
     ignoreModules: ['MMM-ProfileSwitcher', 'MMM-Faces'],
     everyoneClass: 'everyone',
+```
 
 Note that you really need to make sure to add MMM-ProfileSwitcher and MMM-Faces into the
 ignore list, otherwise the mirror won't wake up anything...
