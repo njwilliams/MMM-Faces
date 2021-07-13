@@ -67,7 +67,7 @@ so I've found a couple of shortcuts.
 
 When you install the OpenVino kit, you'll need to update the way in which you invoke Magic Mirror to make sure that you have all of the environment variables correctly configured for OpenVino. For example, if you're using pm2, then edit your start script to add the following line before the invocation of "npm start":
 
-  source ~/openvino/bin/setupvars.sh
+    source ~/openvino/bin/setupvars.sh
 
 If you miss this step, there's no helpful error to say things aren't working (that I've found yet). Instead, you'll find that the Embedder will never move from state "warming..." to "ready" (you can see this status in the info in step 3 of this guide). Note that depending on what version and how it was installed, the path to the setupvars might be different, like /opt/openvivino, or something like that.
 
