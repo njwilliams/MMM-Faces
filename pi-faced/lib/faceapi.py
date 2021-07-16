@@ -335,7 +335,11 @@ class Face():
 
     def assign(self, name):
         newdir = get_path("images", name)
-        os.rename(os.path.join(self.dir, self.filename), os.path.join(newdir, self.filename))
+        try:
+            os.rename(os.path.join(self.dir, self.filename), os.path.join(newdir, self.filename))
+        except Exception as e:
+            logging.error("failed to assign face: %s" % e)
+            return ('Failed to assign face', 500)
         self.name = name
         del Face.Cache[str(self.uuid)]
         self.uuid = uuid.uuid3(uuid.NAMESPACE_URL, 'file://' + name + '/' + self.filename)
