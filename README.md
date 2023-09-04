@@ -1,3 +1,13 @@
+---
+substitutions:
+  title:    README
+  author:   njw@me.com
+  key:      blah
+  status:   draft
+  scope:    public
+  category: magicmirror
+---
+
 # MMM-Faces
 This an extension for the [MagicMirror](https://github.com/MichMich/MagicMirror). It provides facial recognition and informs [MMM-ProfileSwitcher](https://github.com/tosti007/MMM-ProfileSwitcher) of the current user. Without MMM-ProfileSwitcher, this module will not provide any useful effect. 
 
